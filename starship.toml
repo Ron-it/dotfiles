@@ -1,0 +1,113 @@
+#Location: ~/.config/starship.toml
+#What_is_starship: https://starship.rs/
+
+add_newline = true
+command_timeout = 2000
+
+format = """
+$character$os$username$hostname$directory$git_branch$git_status$nodejs$java$python$package
+[╰⎯](bold white) """
+
+[character]
+success_symbol = "╭╴"
+error_symbol = "╭╴"
+
+[os]
+format = '[$symbol](bold white) '
+disabled = false
+
+[os.symbols]
+Windows = ''
+Arch = '󰣇'
+Ubuntu = ''
+Macos = '󰀵'
+Unknown = '󰠥'
+
+[username]
+style_user = 'yellow bold'
+style_root = 'black bold'
+format = '[//](black bold) [$user](#2883ff) '
+disabled = false
+show_always = true
+
+[hostname]
+ssh_only = false
+format = '[//](black bold) [$hostname](bold blue) '
+disabled = false
+
+[directory]
+truncation_length = 0
+truncation_symbol = '…/'
+home_symbol = '~'
+read_only = '  '
+format = '[//](black bold) [$path]($style)[$read_only]($read_only_style) '
+style = '#7ed1fb'
+
+# Shows current git branch
+[git_branch]
+# symbol = ' '
+symbol = ' '
+format = '[//](black bold) [$symbol\[$branch\]]($style) '
+# truncation_length = 0
+# truncation_symbol = '…/'
+style = 'bold green'
+
+# Shows current git status
+[git_status]
+disabled = true
+format = '[ $all_status $ahead_behind]($style) '
+style = 'bold green'
+conflicted = '🏳'
+up_to_date = ''
+untracked = ' '
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+stashed = ' '
+modified = ' '
+staged = '[++\($count\)](green)'
+renamed = '襁 '
+deleted = ' '
+
+[nodejs]
+symbol = " "
+format = '[//](black bold) [$symbol($version )]($style)'
+style = "bold green"
+disabled = false
+detect_files = ["package.json", ".node-version"]
+detect_folders = ["node_modules"]
+
+[java]
+symbol = " "
+format = '[//](black bold) [$symbol($version )]($style)'
+style = "red bold"
+disabled = false
+detect_files = ["pom.xml", "build.gradle", ".java-version"]
+detect_folders = [".java"]
+
+[python]
+symbol = '󰌠'
+python_binary = ['./venv/bin/python', 'python', 'python3', 'python2']
+format = '[//](black bold) [${symbol} ${pyenv_prefix}(${version} )(\($virtualenv\) )]($style) '
+style = "yellow bold"
+detect_files = ["requirements.txt", "pyproject.toml", ".python-version"]
+detect_folders = [".venv", "venv"]
+
+[package]
+symbol = "󰏗 "
+format = '[//](black bold) [$symbol$version]($style) '
+style = "208 bold"
+disabled = false
+
+# Disabled modules
+[vagrant]
+disabled = true
+
+[helm]
+disabled = true
+
+[ruby]
+disabled = true
+
+[terraform]
+disabled = true
