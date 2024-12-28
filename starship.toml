@@ -70,7 +70,7 @@ renamed = '襁 '
 deleted = ' '
 
 [nodejs]
-symbol = " "
+symbol = "󰎙 "
 format = '[//](black bold) [$symbol($version )]($style)'
 style = "bold green"
 disabled = false
@@ -78,7 +78,7 @@ detect_files = ["package.json", ".node-version"]
 detect_folders = ["node_modules"]
 
 [java]
-symbol = " "
+symbol = "󰬷 "
 format = '[//](black bold) [$symbol($version )]($style)'
 style = "red bold"
 disabled = false
