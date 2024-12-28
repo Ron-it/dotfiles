@@ -14,12 +14,17 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install starship
       run: |
         curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-        echo "::add-path::${HOME}/.cargo/bin"
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # Fixed deprecated add-path command
+
+    - name: Install PowerShell
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y powershell
 
     - name: Validate starship.toml
       run: |
@@ -27,4 +32,5 @@ jobs:
 
     - name: Validate PowerShell profile
       run: |
-        pwsh -Command "Invoke-Expression -Command { . ./Microsoft.PowerShell_profile.ps1 }"
+        pwsh -NoProfile -Command "Test-Path -Path ./Microsoft.PowerShell_profile.ps1 -PathType Leaf"
+        pwsh -NoProfile -Command ". ./Microsoft.PowerShell_profile.ps1"
