@@ -19,10 +19,11 @@ jobs:
     - name: Install starship
       run: |
         curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+        echo "::add-path::${HOME}/.cargo/bin"
 
     - name: Validate starship.toml
       run: |
-        ~/.cargo/bin/starship explain --config ./starship.toml
+        starship explain --config ./starship.toml
 
     - name: Validate PowerShell profile
       run: |
