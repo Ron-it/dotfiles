@@ -5,7 +5,7 @@ add_newline = true
 command_timeout = 2000
 
 format = """
-$character$os$username$hostname$directory$git_branch$git_status$nodejs$java$python$package
+$character$os$username$hostname$directory$git_branch$git_status$nodejs$python$java$package
 [╰⎯](bold white) """
 
 [character]
