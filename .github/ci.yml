@@ -19,7 +19,7 @@ jobs:
     - name: Validate starship.toml
       run: |
         sudo apt-get install -y starship
-        starship explain --config ../../../../C:/Users/butir/dotfiles/starship.toml
+        starship explain --config ./starship.toml
 
     - name: Validate PowerShell profile
       run: |
