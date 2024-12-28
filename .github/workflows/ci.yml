@@ -18,7 +18,7 @@ jobs:
 
     - name: Install starship
       run: |
-        curl -fsSL https://starship.rs/install.sh | bash -s -- -y
+        curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 
     - name: Validate starship.toml
       run: |
