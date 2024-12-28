@@ -16,10 +16,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Install starship
+      run: |
+        curl -fsSL https://starship.rs/install.sh | bash -s -- -y
+
     - name: Validate starship.toml
       run: |
-        sudo apt-get install -y starship
-        starship explain --config ./starship.toml
+        ~/.cargo/bin/starship explain --config ./starship.toml
 
     - name: Validate PowerShell profile
       run: |
