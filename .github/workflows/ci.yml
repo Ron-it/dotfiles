@@ -19,16 +19,17 @@ jobs:
     - name: Install starship
       run: |
         curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH  # Fixed deprecated add-path command
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Validate starship.toml
+      run: |
+        export STARSHIP_CONFIG=./starship.toml
+        starship explain
 
     - name: Install PowerShell
       run: |
         sudo apt-get update
         sudo apt-get install -y powershell
-
-    - name: Validate starship.toml
-      run: |
-        starship explain --config ./starship.toml
 
     - name: Validate PowerShell profile
       run: |
