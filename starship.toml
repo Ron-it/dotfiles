@@ -5,7 +5,7 @@ add_newline = true
 command_timeout = 2000
 
 format = """
-$character$os$username$hostname$directory$git_branch$git_status$nodejs$python$java$package
+$character$os$username$hostname$directory$git_branch$git_status$nodejs$python$java$php$package
 [╰⎯](bold white) """
 
 [character]
@@ -92,6 +92,14 @@ format = '[//](black bold) [${symbol} ${pyenv_prefix}(${version} )(\($virtualenv
 style = "yellow bold"
 detect_files = ["requirements.txt", "pyproject.toml", ".python-version"]
 detect_folders = [".venv", "venv"]
+
+[php]
+symbol = '🐘 '
+style = "bold #8892bf"
+format = '[//](black bold) [$symbol($version )]($style) '
+detect_extensions = [ "php" ]
+detect_files = [ "composer.json", ".php-version" ]
+disabled = false
 
 [package]
 symbol = "󰏗 "
