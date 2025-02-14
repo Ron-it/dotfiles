@@ -37,7 +37,7 @@ jobs:
           git commit -m "Update README with rendered starship image"
 
       - name: Upload rendered image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: starship.png
           path: starship.png
+          retention-days: 30
