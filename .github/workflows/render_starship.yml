@@ -1,45 +1,104 @@
-name: Render Starship
+name: Render Starship Prompt
 
+# Here you can trigger manually. You could also add schedule triggers etc.
 on:
-  push:
-    branches: [ main ]
-
-env:
-  STARSHIP_OUTPUT: starship.png
+  workflow_dispatch:
 
 jobs:
   render:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Node.js and npm
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
       - name: Install Starship
         run: |
-          npm install -g starship
-          echo "Verifying starship installation..."
-          starship --version
+          # Install Starship non-interactively:
+          curl -fsSL https://starship.rs/install.sh | bash -s -- -y
+          # Make sure the Starship binary is in the PATH.
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Render Starship configuration
+      - name: Install required packages (aha & chromium)
         run: |
-          starship render --input starship.toml --output $STARSHIP_OUTPUT
+          sudo apt-get update
+          sudo apt-get install -y aha chromium-browser
 
-      - name: Update README with rendered image
+      - name: Generate Starship prompt text
+        env:
+          STARSHIP_CONFIG: ${{ github.workspace }}/starship.toml
         run: |
-          sed -i "s/![](placeholder)/![](starship.png)/g" README.md
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add README.md
-          git commit -m "Update README with rendered starship image"
+          # Generate the prompt output (with ANSI colors and Nerd Font icons)
+          starship prompt > prompt.txt
+          # (Optional) Print output for debugging:
+          cat prompt.txt
 
-      - name: Upload rendered image
-        uses: actions/upload-artifact@v4
-        with:
-          path: starship.png
-          retention-days: 30
+      - name: Convert ANSI output to HTML snippet
+        run: |
+          # Use 'aha' (ANSI HTML Adapter) to convert the ANSI codes to HTML.
+          cat prompt.txt | aha --no-header > prompt_snippet.html
+
+      - name: Create full HTML file for screenshot
+        run: |
+          # We wrap the snippet in our own HTML so we can control CSS.
+          cat << 'EOF' > prompt.html
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              /* Customize these styles as needed. The font-family below
+                 tries MesloLGS NF first, then Fira Code (another popular
+                 Nerd Font choice) then monospace. */
+              body {
+                background-color: #282c34;
+                color: #abb2bf;
+                font-family: 'MesloLGS NF', 'Fira Code', monospace;
+                font-size: 16px;
+                line-height: 1.5;
+                padding: 20px;
+                white-space: pre;
+              }
+            </style>
+          </head>
+          <body>
+          EOF
+          cat prompt_snippet.html >> prompt.html
+          echo "</body></html>" >> prompt.html
+
+      - name: Capture screenshot of rendered prompt
+        run: |
+          # Use Chromium in headless mode to take a screenshot of the HTML.
+          chromium-browser --headless --disable-gpu \
+            --screenshot=starship_prompt.png \
+            --window-size=1200,200 \
+            "file://$GITHUB_WORKSPACE/prompt.html"
+
+      - name: Update README with screenshot
+        run: |
+          # This step looks for markers in your README.
+          # In your README.md, place these markers so the image gets updated:
+          #
+          #   <!-- starship prompt screenshot start -->
+          #   ![Starship Prompt](starship_prompt.png)
+          #   <!-- starship prompt screenshot end -->
+          #
+          # If these markers already exist, we replace the block;
+          # if not, we append the block at the end.
+          if grep -q '<!-- starship prompt screenshot start -->' README.md; then
+            sed -i '/<!-- starship prompt screenshot start -->/,/<!-- starship prompt screenshot end -->/c\<!-- starship prompt screenshot start -->\n![Starship Prompt](starship_prompt.png)\n<!-- starship prompt screenshot end -->' README.md
+          else
+            {
+              echo ""
+              echo "<!-- starship prompt screenshot start -->"
+              echo "![Starship Prompt](starship_prompt.png)"
+              echo "<!-- starship prompt screenshot end -->"
+            } >> README.md
+          fi
+
+      - name: Commit and push updated README and screenshot
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git add README.md starship_prompt.png
+          # Commit only if there are changes.
+          git commit -m "Update starship prompt screenshot" || echo "No changes to commit"
+          git push
