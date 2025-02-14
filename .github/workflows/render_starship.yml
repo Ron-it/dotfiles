@@ -1,0 +1,43 @@
+name: Render Starship
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  STARSHIP_OUTPUT: starship.png
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Starship
+        run: |
+          npm install -g starship
+
+      - name: Render Starship configuration
+        run: |
+          starship render --input starship.toml --output $STARSHIP_OUTPUT
+
+      - name: Update README with rendered image
+        run: |
+          sed -i "s/![](placeholder)/![](starship.png)/g" README.md
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add README.md
+          git commit -m "Update README with rendered starship image"
+
+      - name: Upload rendered image
+        uses: actions/upload-artifact@v3
+        with:
+          name: starship.png
+          path: starship.png
