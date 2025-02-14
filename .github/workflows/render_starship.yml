@@ -20,12 +20,12 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install Starship
+      - name: Install Starship and render configuration
         run: |
           npm install -g starship
-
-      - name: Render Starship configuration
-        run: |
+          echo "Adding npm global directory to PATH"
+          echo "PATH=$(npm root -g):$PATH" >> $GITHUB_ENV
+          starship --version
           starship render --input starship.toml --output $STARSHIP_OUTPUT
 
       - name: Update README with rendered image
