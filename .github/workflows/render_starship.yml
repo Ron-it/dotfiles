@@ -3,18 +3,23 @@ name: Render Starship Prompt
 on:
   push:  # Run on every push
 
+permissions:
+  contents: write
+
 jobs:
   render:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: true
 
       - name: Install Starship
         run: |
-          # Install Starship using sh instead of bash.
+          # Install Starship using sh (to avoid non-POSIX issues)
           curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-          # Ensure the Starship binary is available.
+          # Make sure Starship is in the PATH.
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Install required packages (aha & chromium)
@@ -32,19 +37,19 @@ jobs:
 
       - name: Convert ANSI output to HTML snippet
         run: |
-          # Convert ANSI codes to HTML using 'aha' (without header)
+          # Convert the ANSI codes in prompt.txt to an HTML snippet using aha.
           cat prompt.txt | aha --no-header > prompt_snippet.html
 
       - name: Create full HTML file for screenshot
         run: |
-          # Create an HTML document with our custom CSS.
+          # Wrap the HTML snippet in a complete HTML file with custom CSS.
           cat << 'EOF' > prompt.html
           <html>
           <head>
             <meta charset="utf-8">
             <style>
               /* Customize these styles as needed.
-                 These fonts are popular choices with Nerd Font icons */
+                 The fonts specified below support Nerd Font icons. */
               body {
                 background-color: #282c34;
                 color: #abb2bf;
@@ -63,7 +68,7 @@ jobs:
 
       - name: Capture screenshot of rendered prompt
         run: |
-          # Use Chromium in headless mode to take a screenshot.
+          # Use Chromium in headless mode to take a screenshot of prompt.html.
           chromium-browser --headless --disable-gpu \
             --screenshot=starship_prompt.png \
             --window-size=1200,200 \
@@ -71,8 +76,8 @@ jobs:
 
       - name: Update README with screenshot
         run: |
-          # Update the README by replacing everything between the marker comments,
-          # or append the block if the markers do not exist.
+          # Replace the screenshot block between marker comments if it exists,
+          # or append the block otherwise.
           if grep -q '<!-- starship prompt screenshot start -->' README.md; then
             awk '
               /<!-- starship prompt screenshot start -->/ {
@@ -101,6 +106,4 @@ jobs:
           git config --global user.name "github-actions"
           git add README.md starship_prompt.png
           git commit -m "Update starship prompt screenshot" || echo "No changes to commit"
-          # Set remote URL to include the GitHub token for authentication.
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push
