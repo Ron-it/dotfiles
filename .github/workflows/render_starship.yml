@@ -71,9 +71,8 @@ jobs:
 
       - name: Update README with screenshot
         run: |
-          # This step will update your README.md by replacing any block between
-          # the marker comments with the new screenshot line, or it appends the block
-          # if the markers do not exist.
+          # Update the README by replacing everything between the marker comments,
+          # or append the block if the markers do not exist.
           if grep -q '<!-- starship prompt screenshot start -->' README.md; then
             awk '
               /<!-- starship prompt screenshot start -->/ {
@@ -101,6 +100,7 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
           git add README.md starship_prompt.png
-          # Commit only if there are changes.
           git commit -m "Update starship prompt screenshot" || echo "No changes to commit"
+          # Set remote URL to include the GitHub token for authentication.
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git push
