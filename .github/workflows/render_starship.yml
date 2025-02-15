@@ -17,9 +17,9 @@ jobs:
 
       - name: Install Starship
         run: |
-          # Install Starship using sh to avoid non-POSIX bash issues.
+          # Install Starship using sh (POSIX-compliant)
           curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-          # Ensure Starship is on the PATH.
+          # Add Starship to the PATH.
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
       - name: Install required packages (aha & chromium)
@@ -40,32 +40,31 @@ jobs:
               echo "<?php echo 'Hello, world'; ?>" > "${lang}_project/index.php"
             fi
 
-            # Run Starship in the project directory so that its prompt reflects that context.
+            # Run Starship in the project directory to capture language context.
             (cd "${lang}_project" && starship prompt > "../prompt_${lang}.txt")
 
             # Convert the ANSI-colored prompt to an HTML snippet.
             cat "prompt_${lang}.txt" | aha --no-header > "prompt_snippet_${lang}.html"
 
-            # Create a full HTML file wrapping the snippet.
-            # The CSS below uses JetBrains Mono Nerd Font.
-            cat << 'EOF' > "prompt_${lang}.html"
-            <html>
-            <head>
-              <meta charset="utf-8">
-              <style>
-                body {
-                  background-color: #282c34;
-                  color: #abb2bf;
-                  font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', monospace;
-                  font-size: 16px;
-                  line-height: 1.5;
-                  padding: 20px;
-                  white-space: pre;
-                }
-              </style>
-            </head>
-            <body>
-            EOF
+            # Create the complete HTML file. Using <<-'EOF' strips leading tabs.
+            cat <<-'EOF' > "prompt_${lang}.html"
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background-color: #282c34;
+      color: #abb2bf;
+      font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', monospace;
+      font-size: 16px;
+      line-height: 1.5;
+      padding: 20px;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+EOF
             cat "prompt_snippet_${lang}.html" >> "prompt_${lang}.html"
             echo "</body></html>" >> "prompt_${lang}.html"
 
