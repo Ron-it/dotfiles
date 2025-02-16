@@ -9,7 +9,7 @@ command_timeout = 2000
 # [╰⎯](bold white) """
 
 format = """
-[╭─](white)$os$username$hostname$directory$package$java$python$git_branch$gitstatus$nodejs$java$php$cmd_duration
+[╭─](white)$os$username$hostname$directory$package$java$python$git_branch$gitstatus$nodejs$php$cmd_duration
 [╰─](white)$character """
 
 [character]
